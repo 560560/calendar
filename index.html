@@ -153,8 +153,10 @@
             pointer-events: none;
         }
 
+        /* Выходные и праздники - красный цвет */
         .day.saturday .day-number,
-        .day.sunday .day-number {
+        .day.sunday .day-number,
+        .day.holiday .day-number {
             color: #ff3366;
         }
 
@@ -189,6 +191,13 @@
             font-size: clamp(10px, 3vw, 14px);
             color: #666;
             line-height: 1.3;
+        }
+
+        .legend {
+            margin-top: clamp(8px, 2vw, 15px);
+            text-align: center;
+            font-size: clamp(9px, 2.5vw, 12px);
+            color: #666;
         }
 
         @media (min-width: 600px) {
@@ -242,23 +251,27 @@
 
         <div class="calendar" id="calendar">
             <!-- Май 2026: 1 мая - пятница -->
+            <!-- Праздники: 1-3 мая (Праздник Весны и Труда), 9-11 мая (День Победы) -->
             
             <!-- Неделя 1 -->
             <div class="day empty"></div>
             <div class="day empty"></div>
             <div class="day empty"></div>
             <div class="day empty"></div>
-            <div class="day" data-day="1">
+            <!-- 1 мая - Праздник Весны и Труда (выходной) -->
+            <div class="day holiday" data-day="1">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">1</span>
             </div>
-            <div class="day saturday" data-day="2">
+            <!-- 2 мая - выходной (суббота) -->
+            <div class="day saturday holiday" data-day="2">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">2</span>
             </div>
-            <div class="day sunday" data-day="3">
+            <!-- 3 мая - выходной (воскресенье) -->
+            <div class="day sunday holiday" data-day="3">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">3</span>
@@ -290,19 +303,22 @@
                 <div class="day-half right"></div>
                 <span class="day-number">8</span>
             </div>
-            <div class="day saturday" data-day="9">
+            <!-- 9 мая - День Победы (выходной) -->
+            <div class="day saturday holiday" data-day="9">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">9</span>
             </div>
-            <div class="day sunday" data-day="10">
+            <!-- 10 мая - воскресенье (выходной) -->
+            <div class="day sunday holiday" data-day="10">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">10</span>
             </div>
 
             <!-- Неделя 3 -->
-            <div class="day" data-day="11">
+            <!-- 11 мая - перенесённый выходной -->
+            <div class="day holiday" data-day="11">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">11</span>
@@ -411,6 +427,11 @@
                 <div class="day-half right"></div>
                 <span class="day-number">31</span>
             </div>
+        </div>
+
+        <div class="legend">
+            🔴 1–3 мая — Праздник Весны и Труда<br>
+            🔴 9–11 мая — День Победы
         </div>
     </div>
 
