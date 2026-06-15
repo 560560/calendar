@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Май 2026 - Интерактивный график</title>
+    <title>Июнь 2026 - Интерактивный график</title>
     <style>
         * {
             margin: 0;
@@ -223,7 +223,7 @@
 </head>
 <body>
     <div class="calendar-container">
-        <h1>МАЙ 2026</h1>
+        <h1>ИЮНЬ 2026</h1>
         
         <div class="instruction">
             Выберите цвет и кликайте по половинкам дней.<br>
@@ -250,34 +250,25 @@
         </div>
 
         <div class="calendar" id="calendar">
-            <!-- Май 2026: 1 мая - пятница -->
-            <!-- Праздники: 1-3 мая (Праздник Весны и Труда), 9-11 мая (День Победы) -->
+            <!-- Июнь 2026: 1 июня - понедельник -->
+            <!-- Праздник: 12-14 июня (День России) -->
             
             <!-- Неделя 1 -->
-            <div class="day empty"></div>
-            <div class="day empty"></div>
-            <div class="day empty"></div>
-            <div class="day empty"></div>
-            <!-- 1 мая - Праздник Весны и Труда (выходной) -->
-            <div class="day holiday" data-day="1">
+            <div class="day" data-day="1">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">1</span>
             </div>
-            <!-- 2 мая - выходной (суббота) -->
-            <div class="day saturday holiday" data-day="2">
+            <div class="day" data-day="2">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">2</span>
             </div>
-            <!-- 3 мая - выходной (воскресенье) -->
-            <div class="day sunday holiday" data-day="3">
+            <div class="day" data-day="3">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">3</span>
             </div>
-
-            <!-- Неделя 2 -->
             <div class="day" data-day="4">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
@@ -288,73 +279,73 @@
                 <div class="day-half right"></div>
                 <span class="day-number">5</span>
             </div>
-            <div class="day" data-day="6">
+            <div class="day saturday" data-day="6">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">6</span>
             </div>
-            <div class="day" data-day="7">
+            <div class="day sunday" data-day="7">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">7</span>
             </div>
+
+            <!-- Неделя 2 -->
             <div class="day" data-day="8">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">8</span>
             </div>
-            <!-- 9 мая - День Победы (выходной) -->
-            <div class="day saturday holiday" data-day="9">
+            <div class="day" data-day="9">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">9</span>
             </div>
-            <!-- 10 мая - воскресенье (выходной) -->
-            <div class="day sunday holiday" data-day="10">
+            <div class="day" data-day="10">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">10</span>
             </div>
-
-            <!-- Неделя 3 -->
-            <!-- 11 мая - перенесённый выходной -->
-            <div class="day holiday" data-day="11">
+            <div class="day" data-day="11">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">11</span>
             </div>
-            <div class="day" data-day="12">
+            <!-- 12 июня - День России (выходной) -->
+            <div class="day holiday" data-day="12">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">12</span>
             </div>
-            <div class="day" data-day="13">
+            <!-- 13 июня - суббота (выходной) -->
+            <div class="day saturday holiday" data-day="13">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">13</span>
             </div>
-            <div class="day" data-day="14">
+            <!-- 14 июня - воскресенье (выходной) -->
+            <div class="day sunday holiday" data-day="14">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">14</span>
             </div>
+
+            <!-- Неделя 3 -->
             <div class="day" data-day="15">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">15</span>
             </div>
-            <div class="day saturday" data-day="16">
+            <div class="day" data-day="16">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">16</span>
             </div>
-            <div class="day sunday" data-day="17">
+            <div class="day" data-day="17">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">17</span>
             </div>
-
-            <!-- Неделя 4 -->
             <div class="day" data-day="18">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
@@ -365,33 +356,33 @@
                 <div class="day-half right"></div>
                 <span class="day-number">19</span>
             </div>
-            <div class="day" data-day="20">
+            <div class="day saturday" data-day="20">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">20</span>
             </div>
-            <div class="day" data-day="21">
+            <div class="day sunday" data-day="21">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">21</span>
             </div>
+
+            <!-- Неделя 4 -->
             <div class="day" data-day="22">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">22</span>
             </div>
-            <div class="day saturday" data-day="23">
+            <div class="day" data-day="23">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">23</span>
             </div>
-            <div class="day sunday" data-day="24">
+            <div class="day" data-day="24">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">24</span>
             </div>
-
-            <!-- Неделя 5 -->
             <div class="day" data-day="25">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
@@ -402,36 +393,37 @@
                 <div class="day-half right"></div>
                 <span class="day-number">26</span>
             </div>
-            <div class="day" data-day="27">
+            <div class="day saturday" data-day="27">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">27</span>
             </div>
-            <div class="day" data-day="28">
+            <div class="day sunday" data-day="28">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">28</span>
             </div>
+
+            <!-- Неделя 5 -->
             <div class="day" data-day="29">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">29</span>
             </div>
-            <div class="day saturday" data-day="30">
+            <div class="day" data-day="30">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">30</span>
             </div>
-            <div class="day sunday" data-day="31">
-                <div class="day-half left"></div>
-                <div class="day-half right"></div>
-                <span class="day-number">31</span>
-            </div>
+            <div class="day empty"></div>
+            <div class="day empty"></div>
+            <div class="day empty"></div>
+            <div class="day empty"></div>
+            <div class="day empty"></div>
         </div>
 
         <div class="legend">
-            🔴 1–3 мая — Праздник Весны и Труда<br>
-            🔴 9–11 мая — День Победы
+            🔴 12–14 июня — День России
         </div>
     </div>
 
