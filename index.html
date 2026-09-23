@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сентябрь 2026 - Интерактивный график</title>
+    <title>Октябрь 2026 - Интерактивный график</title>
     <style>
         * {
             margin: 0;
@@ -79,11 +79,15 @@
             box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
         }
 
-        .color-btn.blue {
+        .color-btn.blue,
+        .day-half.blue,
+        .nights-swatch.blue {
             background-color: #66ccff;
         }
 
-        .color-btn.pink {
+        .color-btn.pink,
+        .day-half.pink,
+        .nights-swatch.pink {
             background-color: #ff99cc;
         }
 
@@ -101,6 +105,39 @@
 
         .reset-btn:active {
             background-color: #cc0033;
+        }
+
+        /* Счётчик ночей */
+        .nights {
+            display: flex;
+            justify-content: center;
+            gap: clamp(10px, 4vw, 24px);
+            flex-wrap: wrap;
+            margin-bottom: clamp(8px, 2vw, 12px);
+            padding: clamp(6px, 1.5vw, 10px);
+            border: 2px solid #333;
+        }
+
+        .nights-title {
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            font-size: clamp(12px, 3.5vw, 16px);
+        }
+
+        .nights-item {
+            display: flex;
+            align-items: center;
+            gap: clamp(4px, 1.5vw, 8px);
+            font-size: clamp(14px, 4vw, 20px);
+            font-weight: bold;
+        }
+
+        .nights-swatch {
+            width: clamp(18px, 5vw, 26px);
+            height: clamp(18px, 5vw, 26px);
+            border: 2px solid #333;
+            flex-shrink: 0;
         }
 
         .weekdays {
@@ -223,8 +260,8 @@
 </head>
 <body>
     <div class="calendar-container">
-        <h1>СЕНТЯБРЬ 2026</h1>
-        
+        <h1>ОКТЯБРЬ 2026</h1>
+
         <div class="instruction">
             Выберите цвет и кликайте по половинкам дней.<br>
             Левая = утро, правая = вечер
@@ -238,7 +275,19 @@
             </div>
             <button class="reset-btn" onclick="resetCalendar()">Очистить</button>
         </div>
-        
+
+        <div class="nights">
+            <div class="nights-title">Ночей за месяц</div>
+            <div class="nights-item">
+                <div class="nights-swatch blue"></div>
+                <span id="nights-blue">0</span>
+            </div>
+            <div class="nights-item">
+                <div class="nights-swatch pink"></div>
+                <span id="nights-pink">0</span>
+            </div>
+        </div>
+
         <div class="weekdays">
             <div class="weekday">ПН</div>
             <div class="weekday">ВТ</div>
@@ -250,9 +299,9 @@
         </div>
 
         <div class="calendar" id="calendar">
-            <!-- Сентябрь 2026: 1 сентября - вторник. Праздников нет -->
-            
-            <!-- Неделя 1 -->
+            <!-- Октябрь 2026: 1 октября - четверг. Праздников нет -->
+            <div class="day empty"></div>
+            <div class="day empty"></div>
             <div class="day empty"></div>
             <div class="day" data-day="1">
                 <div class="day-half left"></div>
@@ -264,28 +313,26 @@
                 <div class="day-half right"></div>
                 <span class="day-number">2</span>
             </div>
-            <div class="day" data-day="3">
+            <div class="day saturday" data-day="3">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">3</span>
             </div>
-            <div class="day" data-day="4">
+            <div class="day sunday" data-day="4">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">4</span>
             </div>
-            <div class="day saturday" data-day="5">
+            <div class="day" data-day="5">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">5</span>
             </div>
-            <div class="day sunday" data-day="6">
+            <div class="day" data-day="6">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">6</span>
             </div>
-
-            <!-- Неделя 2 -->
             <div class="day" data-day="7">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
@@ -301,28 +348,26 @@
                 <div class="day-half right"></div>
                 <span class="day-number">9</span>
             </div>
-            <div class="day" data-day="10">
+            <div class="day saturday" data-day="10">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">10</span>
             </div>
-            <div class="day" data-day="11">
+            <div class="day sunday" data-day="11">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">11</span>
             </div>
-            <div class="day saturday" data-day="12">
+            <div class="day" data-day="12">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">12</span>
             </div>
-            <div class="day sunday" data-day="13">
+            <div class="day" data-day="13">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">13</span>
             </div>
-
-            <!-- Неделя 3 -->
             <div class="day" data-day="14">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
@@ -338,28 +383,26 @@
                 <div class="day-half right"></div>
                 <span class="day-number">16</span>
             </div>
-            <div class="day" data-day="17">
+            <div class="day saturday" data-day="17">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">17</span>
             </div>
-            <div class="day" data-day="18">
+            <div class="day sunday" data-day="18">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">18</span>
             </div>
-            <div class="day saturday" data-day="19">
+            <div class="day" data-day="19">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">19</span>
             </div>
-            <div class="day sunday" data-day="20">
+            <div class="day" data-day="20">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">20</span>
             </div>
-
-            <!-- Неделя 4 -->
             <div class="day" data-day="21">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
@@ -375,28 +418,26 @@
                 <div class="day-half right"></div>
                 <span class="day-number">23</span>
             </div>
-            <div class="day" data-day="24">
+            <div class="day saturday" data-day="24">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">24</span>
             </div>
-            <div class="day" data-day="25">
+            <div class="day sunday" data-day="25">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">25</span>
             </div>
-            <div class="day saturday" data-day="26">
+            <div class="day" data-day="26">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">26</span>
             </div>
-            <div class="day sunday" data-day="27">
+            <div class="day" data-day="27">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
                 <span class="day-number">27</span>
             </div>
-
-            <!-- Неделя 5 -->
             <div class="day" data-day="28">
                 <div class="day-half left"></div>
                 <div class="day-half right"></div>
@@ -412,20 +453,30 @@
                 <div class="day-half right"></div>
                 <span class="day-number">30</span>
             </div>
-            <div class="day empty"></div>
-            <div class="day empty"></div>
-            <div class="day empty"></div>
+            <div class="day saturday" data-day="31">
+                <div class="day-half left"></div>
+                <div class="day-half right"></div>
+                <span class="day-number">31</span>
+            </div>
             <div class="day empty"></div>
         </div>
 
         <div class="legend">
-            В сентябре 2026 государственных праздников нет —<br>
+            В октябре 2026 государственных праздников нет —<br>
             красным отмечены только субботы и воскресенья
         </div>
     </div>
 
     <script>
         let selectedColor = 'blue';
+
+        // Считаем ночи — закрашенные правые половинки
+        function updateNights() {
+            document.getElementById('nights-blue').textContent =
+                document.querySelectorAll('.day-half.right.blue').length;
+            document.getElementById('nights-pink').textContent =
+                document.querySelectorAll('.day-half.right.pink').length;
+        }
 
         document.querySelectorAll('.color-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -437,23 +488,22 @@
 
         document.querySelectorAll('.day-half').forEach(half => {
             half.addEventListener('click', function() {
-                const currentColor = this.style.backgroundColor;
-                const blueColor = 'rgb(102, 204, 255)';
-                const pinkColor = 'rgb(255, 153, 204)';
-                
-                if ((selectedColor === 'blue' && currentColor === blueColor) ||
-                    (selectedColor === 'pink' && currentColor === pinkColor)) {
-                    this.style.backgroundColor = '';
+                // Повторный клик тем же цветом — стирает
+                if (this.classList.contains(selectedColor)) {
+                    this.classList.remove(selectedColor);
                 } else {
-                    this.style.backgroundColor = selectedColor === 'blue' ? '#66ccff' : '#ff99cc';
+                    this.classList.remove('blue', 'pink');
+                    this.classList.add(selectedColor);
                 }
+                updateNights();
             });
         });
 
         function resetCalendar() {
             document.querySelectorAll('.day-half').forEach(half => {
-                half.style.backgroundColor = '';
+                half.classList.remove('blue', 'pink');
             });
+            updateNights();
         }
     </script>
 </body>
