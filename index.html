@@ -16,8 +16,11 @@
             --panel: #f6f2fa;
             --border: #e3ddec;
             --day-border: #e6e0eb;
-            --weekend-ink: #8f3e61;
-            --weekend-surface: #fcf4f7;
+            --weekend-ink: #a12146;
+            --weekend-edge: #c74268;
+            --weekend-surface: #ffe6ea;
+            --short-ink: #623400;
+            --short-surface: #ffce67;
             --blue: #c8e0f7;
             --blue-edge: #537ba4;
             --pink: #f2cfe1;
@@ -85,7 +88,7 @@
             line-height: 1.08;
         }
 
-        button, select {
+        button, .month-trigger {
             box-sizing: border-box;
             min-height: 44px;
             border: 1px solid var(--border);
@@ -98,30 +101,115 @@
         button { cursor: pointer; touch-action: manipulation; }
         button:disabled { cursor: default; }
 
-        button:focus, select:focus, a:focus { outline: 2px solid var(--focus); outline-offset: 2px; }
-        button:focus:not(:focus-visible), select:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
+        button:focus, .month-trigger:focus, a:focus { outline: 2px solid var(--focus); outline-offset: 2px; }
+        button:focus:not(:focus-visible), .month-trigger:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
 
         .month-navigation {
             display: grid;
-            grid-template-columns: 44px minmax(0, 154px) 44px auto;
+            grid-template-columns: 44px minmax(0, 172px) 44px auto;
             gap: 6px;
             align-items: stretch;
         }
 
         .month-navigation button:disabled { opacity: .42; }
-        .month-navigation select {
+        .month-picker { position: relative; min-width: 0; }
+        .month-trigger {
+            position: relative;
+            display: flex;
+            align-items: center;
             width: 100%;
-            min-width: 0;
-            padding-inline: 9px;
+            height: 100%;
+            padding-inline: 12px 36px;
             font-size: 16px;
+            cursor: pointer;
+            list-style: none;
         }
+        .month-trigger::-webkit-details-marker { display: none; }
+        .month-picker[open] .month-trigger { border-color: #a995ca; background: var(--panel); }
 
         .arrow-btn { display: grid; place-items: center; }
-        .arrow-btn span {
+        .arrow-btn span, .month-trigger::after {
             width: 7px;
             height: 7px;
             border-top: 2px solid currentColor;
             border-right: 2px solid currentColor;
+        }
+        .month-trigger::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            inset-inline-end: 15px;
+            color: var(--muted);
+            transform: translateY(-70%) rotate(135deg);
+            pointer-events: none;
+        }
+        .month-picker[open] .month-trigger::after { transform: translateY(-30%) rotate(-45deg); }
+        .month-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            z-index: 20;
+            box-sizing: border-box;
+            width: min(320px, calc(100vw - 32px));
+            max-height: 72vh;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding: 14px;
+            border: 1px solid #d8cde6;
+            border-radius: 18px;
+            background: var(--paper);
+            box-shadow: 0 12px 36px rgb(54 35 83 / 15%), 0 2px 6px rgb(54 35 83 / 6%);
+        }
+        .month-menu.above { top: auto; bottom: calc(100% + 6px); }
+        .year-group + .year-group { margin-top: 14px; }
+        .year-heading {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 4px 7px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 680;
+            font-variant-numeric: tabular-nums;
+        }
+        .year-heading::after { content: ""; flex: 1; border-top: 1px solid var(--border); }
+        .month-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 4px;
+        }
+        .month-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+            padding: 6px 10px;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            background: #f8f6fb;
+            font-size: 15px;
+            text-align: start;
+        }
+        .month-option[aria-current="true"] {
+            background: var(--lavender);
+            border-color: #c2addf;
+            color: var(--accent-strong);
+            font-weight: 700;
+        }
+        .month-option[aria-current="true"]::after {
+            content: "";
+            flex: none;
+            width: 8px;
+            height: 4px;
+            border: solid currentColor;
+            border-width: 0 0 2px 2px;
+            transform: rotate(-45deg);
+        }
+        .month-option:focus-visible { outline-offset: -2px; }
+        @media (hover: hover) {
+            .month-option:not([aria-current]):hover, .month-trigger:hover { background: #efe9f7; }
+        }
+        .arrow-btn span {
             transform: translateX(-1px) rotate(45deg);
         }
         #previous-month span { transform: translateX(1px) rotate(-135deg); }
@@ -190,15 +278,10 @@
             transform: translate(-50%, -65%) rotate(-45deg);
         }
 
-        .instruction {
-            margin: 8px 0 12px;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
         .actions {
             display: grid;
             gap: 6px;
+            margin-top: 12px;
         }
 
         .fill-btn, .reset-btn {
@@ -216,7 +299,7 @@
         .reset-btn {
             border-color: transparent;
             background: transparent;
-            color: var(--weekend-ink);
+            color: #8f3e61;
         }
 
         .status, .storage-note {
@@ -224,8 +307,8 @@
             color: var(--muted);
         }
         .status:not(:empty) { margin-top: 7px; }
-        .storage-note { margin: 12px 0 0; }
-        .storage-note.warning { color: #8b3625; }
+        .storage-note { margin: 12px 0 0; color: #8b3625; }
+        .storage-note:empty { display: none; }
 
         .nights {
             margin-top: 14px;
@@ -307,11 +390,24 @@
             line-height: 1;
         }
 
-        .day-number sup {
+        .short-mark {
+            display: inline-grid;
+            place-items: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--short-surface);
+            color: var(--short-ink);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .day .short-mark {
             position: absolute;
-            top: 0;
-            inset-inline-start: calc(100% + 1px);
-            font-size: .58em;
+            top: 2px;
+            right: 2px;
+            z-index: 2;
+            pointer-events: none;
         }
 
         .day.today { border-color: var(--accent); }
@@ -331,7 +427,6 @@
             background: var(--accent);
             color: white;
         }
-        .day.today .day-number sup { color: var(--accent-strong); }
 
         .day-half {
             position: absolute;
@@ -380,8 +475,10 @@
             border: 1px solid var(--accent);
             border-radius: 3px;
         }
-        .legend-key .off-key { background: var(--weekend-surface); border-color: var(--weekend-ink); }
-        .legend-key b { color: var(--accent); font-size: 16px; line-height: .8; }
+        .legend-key .off-key {
+            background: var(--weekend-surface);
+            border-color: var(--weekend-edge);
+        }
 
         #month-notes:not(:empty) {
             display: grid;
@@ -431,7 +528,7 @@
                 gap: 10px 12px;
                 padding: 12px;
             }
-            .actions { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) auto; }
+            .actions { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) auto; margin-top: 0; }
             .nights {
                 grid-column: 2;
                 grid-row: 1;
@@ -440,18 +537,25 @@
                 border: 0;
             }
             .nights-item { min-width: 0; padding-block: 8px; }
-            .instruction { margin: 6px 0 0; }
             .storage-note, .status { grid-column: 1 / -1; margin: 0; }
             .status:not(:empty) { margin-top: 0; }
             .status:empty { display: none; }
         }
 
-        @media (max-width: 420px) {
+        @media (max-width: 480px) {
             .month-navigation { grid-template-columns: 44px minmax(0, 1fr) 44px; }
             #current-month { grid-column: 1 / -1; }
+        }
+        @media (max-width: 420px) {
             .actions { grid-template-columns: minmax(0, 1fr) minmax(0, .58fr); }
             .calendar, .weekdays { gap: 3px; }
             .day { border-radius: 8px; }
+            .day .short-mark { width: 13px; height: 13px; font-size: 10px; }
+        }
+        @media (max-width: 340px) {
+            .month-navigation { column-gap: 4px; }
+            .month-trigger { padding-inline: 7px 22px; }
+            .month-trigger::after { inset-inline-end: 8px; }
         }
 
         @media print {
@@ -478,7 +582,10 @@
             </div>
             <nav class="month-navigation" aria-label="Переключение месяца">
                 <button type="button" class="arrow-btn" id="previous-month" aria-label="Предыдущий месяц" title="Предыдущий месяц"><span aria-hidden="true"></span></button>
-                <select id="month-select" aria-label="Месяц и год"></select>
+                <details class="month-picker" id="month-picker">
+                    <summary class="month-trigger" id="month-select" aria-controls="month-menu"></summary>
+                    <div class="month-menu" id="month-menu" role="group" aria-label="Выбор месяца"></div>
+                </details>
                 <button type="button" class="arrow-btn" id="next-month" aria-label="Следующий месяц" title="Следующий месяц"><span aria-hidden="true"></span></button>
                 <button type="button" id="current-month">Текущий месяц</button>
             </nav>
@@ -492,7 +599,6 @@
                         <button type="button" class="color-btn blue active" data-color="blue" aria-label="Голубой" title="Голубой" aria-pressed="true"></button>
                         <button type="button" class="color-btn pink" data-color="pink" aria-label="Розовый" title="Розовый" aria-pressed="false"></button>
                     </div>
-                    <p class="instruction">Утро слева, вечер справа.</p>
                 </div>
                 <div class="actions">
                     <button type="button" class="fill-btn" id="fill-free">Заполнить свободные дни</button>
@@ -506,7 +612,7 @@
                     </div>
                 </div>
                 <div class="status" id="status" role="status"></div>
-                <p class="storage-note" id="storage-note" role="status">Раскраска сохраняется в этом браузере.</p>
+                <p class="storage-note" id="storage-note" role="status"></p>
             </div>
 
             <div class="board">
@@ -526,7 +632,7 @@
             <footer class="legend">
                 <p class="legend-key">
                     <span><i class="off-key" aria-hidden="true"></i>Выходной</span>
-                    <span><b aria-hidden="true">*</b>Сокращённый день</span>
+                    <span><b class="short-mark" aria-hidden="true">✦</b>Сокращённый день</span>
                     <span><i aria-hidden="true"></i>Сегодня</span>
                 </p>
                 <ul id="month-notes" aria-label="Праздники, переносы и сокращённые дни"></ul>
@@ -565,7 +671,9 @@
         const workingWeekends = new Set(['2027-02-20']);
         const shortDays = new Set(['2026-11-03', '2027-02-20', '2027-04-30', '2027-06-11', '2027-11-03']);
         const calendar = document.getElementById('calendar');
-        const select = document.getElementById('month-select');
+        const picker = document.getElementById('month-picker');
+        const monthTrigger = document.getElementById('month-select');
+        const monthMenu = document.getElementById('month-menu');
         const status = document.getElementById('status');
         const storageNote = document.getElementById('storage-note');
         const memory = new Map();
@@ -584,7 +692,6 @@
         function storageWarning() {
             storageIssue = true;
             storageNote.textContent = 'Не удалось прочитать или сохранить данные. Изменения доступны в этой вкладке, но могут не сохраниться после закрытия. Проверьте доступ браузера к хранилищу.';
-            storageNote.classList.add('warning');
         }
         function readMonth() {
             const key = monthKey(visibleMonth);
@@ -613,8 +720,7 @@
             try {
                 localStorage.setItem(STORAGE_PREFIX + monthKey(visibleMonth), JSON.stringify(monthData));
                 storageIssue = false;
-                storageNote.textContent = 'Раскраска сохранена в этом браузере.';
-                storageNote.classList.remove('warning');
+                storageNote.textContent = '';
             } catch (error) { storageWarning(); }
         }
         function dayInfo(year, month, day) {
@@ -649,7 +755,12 @@
             const title = monthNames[month] + ' ' + year;
             document.getElementById('month-heading').textContent = title;
             document.title = title + ' - Интерактивный график';
-            select.value = String(visibleMonth);
+            monthTrigger.textContent = title;
+            monthTrigger.setAttribute('aria-label', 'Выбрать месяц, ' + title);
+            for (const option of monthOptions) {
+                if (Number(option.value) === visibleMonth) option.setAttribute('aria-current', 'true');
+                else option.removeAttribute('aria-current');
+            }
             document.getElementById('previous-month').disabled = visibleMonth === START;
             document.getElementById('next-month').disabled = visibleMonth === END;
             calendar.replaceChildren();
@@ -689,9 +800,11 @@
                     number.className = 'day-number';
                     number.textContent = day;
                     if (info.short) {
-                        const star = document.createElement('sup');
-                        star.textContent = '*';
-                        number.append(star);
+                        const star = document.createElement('span');
+                        star.className = 'short-mark';
+                        star.textContent = '✦';
+                        star.setAttribute('aria-hidden', 'true');
+                        box.append(star);
                     }
                     box.append(number);
                     if (info.note || info.short) {
@@ -715,16 +828,101 @@
             status.textContent = '';
             renderMonth();
         }
-        for (let index = START; index <= END; index++) {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = monthNames[index % 12] + ' ' + Math.floor(index / 12);
-            select.append(option);
+        function buildMonthMenu() {
+            for (let year = Math.floor(START / 12); year <= Math.floor(END / 12); year++) {
+                const group = document.createElement('div');
+                group.className = 'year-group';
+                const heading = document.createElement('h2');
+                heading.className = 'year-heading';
+                heading.textContent = year;
+                const choices = document.createElement('div');
+                choices.className = 'month-options';
+                for (let index = Math.max(START, year * 12); index <= Math.min(END, year * 12 + 11); index++) {
+                    const option = document.createElement('button');
+                    option.type = 'button';
+                    option.className = 'month-option';
+                    option.value = index;
+                    option.textContent = monthNames[index % 12];
+                    option.setAttribute('aria-label', option.textContent + ' ' + year);
+                    choices.append(option);
+                }
+                group.append(heading, choices);
+                monthMenu.append(group);
+            }
+            return Array.from(monthMenu.querySelectorAll('.month-option'));
         }
+        const monthOptions = buildMonthMenu();
+
+        function positionMonthMenu() {
+            if (!picker.open) return;
+            const anchor = monthTrigger.getBoundingClientRect();
+            const margin = 12;
+            const left = Math.max(margin, Math.min(anchor.left,
+                document.documentElement.clientWidth - monthMenu.offsetWidth - margin));
+            monthMenu.style.left = (left - anchor.left) + 'px';
+            const below = window.innerHeight - anchor.bottom - margin - 6;
+            const above = anchor.top - margin - 6;
+            const placeAbove = below < monthMenu.scrollHeight + 2 && above > below;
+            monthMenu.classList.toggle('above', placeAbove);
+            monthMenu.style.maxHeight = Math.max(0, placeAbove ? above : below) + 'px';
+        }
+        function focusMonthOption(option) {
+            option.focus({preventScroll: true});
+            const box = monthMenu.getBoundingClientRect();
+            const row = option.getBoundingClientRect();
+            if (row.top < box.top + 6) monthMenu.scrollTop += row.top - box.top - 6;
+            if (row.bottom > box.bottom - 6) monthMenu.scrollTop += row.bottom - box.bottom + 6;
+        }
+        function closeMonthMenu() {
+            picker.open = false;
+            monthTrigger.focus({preventScroll: true});
+        }
+        picker.addEventListener('toggle', () => {
+            if (!picker.open) return;
+            positionMonthMenu();
+            focusMonthOption(monthOptions[visibleMonth - START]);
+        });
+        monthMenu.addEventListener('click', event => {
+            const option = event.target.closest('.month-option');
+            if (!option) return;
+            changeMonth(Number(option.value));
+            closeMonthMenu();
+        });
+        picker.addEventListener('keydown', event => {
+            if (event.altKey || event.metaKey || event.ctrlKey) return;
+            if (!picker.open) {
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    picker.open = true;
+                }
+                return;
+            }
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closeMonthMenu();
+                return;
+            }
+            const index = monthOptions.indexOf(event.target);
+            if (index < 0) return;
+            const target = {
+                ArrowLeft: index - 1, ArrowRight: index + 1,
+                ArrowUp: index - 2, ArrowDown: index + 2,
+                Home: 0, End: monthOptions.length - 1
+            }[event.key];
+            if (target === undefined) return;
+            event.preventDefault();
+            focusMonthOption(monthOptions[Math.max(0, Math.min(monthOptions.length - 1, target))]);
+        });
+        document.addEventListener('click', event => {
+            if (picker.open && !picker.contains(event.target)) picker.open = false;
+        });
+        picker.addEventListener('focusout', event => {
+            if (event.relatedTarget && !picker.contains(event.relatedTarget)) picker.open = false;
+        });
+        window.addEventListener('resize', positionMonthMenu);
         document.getElementById('previous-month').addEventListener('click', () => changeMonth(visibleMonth - 1));
         document.getElementById('next-month').addEventListener('click', () => changeMonth(visibleMonth + 1));
         document.getElementById('current-month').addEventListener('click', () => changeMonth(currentMonth()));
-        select.addEventListener('change', () => changeMonth(Number(select.value)));
         document.querySelectorAll('.color-btn').forEach(button => {
             button.addEventListener('click', () => {
                 selectedColor = button.dataset.color;
