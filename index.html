@@ -6,6 +6,7 @@
     <title>Ноябрь 2026 - Интерактивный график</title>
     <style>
         :root {
+            -webkit-tap-highlight-color: transparent;
             --ink: #2e2842;
             --muted: #625b73;
             --accent: #514183;
@@ -26,7 +27,6 @@
             --pink: #f2cfe1;
             --pink-edge: #a65f85;
             --focus: #503b9a;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -326,9 +326,16 @@
             border: 1px solid var(--border);
             border-radius: 9px;
             background: var(--paper);
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
+        }
+
+        .nights-value {
+            flex: none;
+            inline-size: 2ch;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            text-align: end;
         }
 
         .nights-swatch {
@@ -608,8 +615,8 @@
                 <div class="nights" role="group" aria-labelledby="nights-heading">
                     <h2 class="tool-title" id="nights-heading" title="По закрашенным вечерним половинкам">Ночей за месяц</h2>
                     <div class="nights-counts">
-                        <div class="nights-item"><span class="nights-swatch blue" role="img" aria-label="Голубой"></span><span id="nights-blue">0</span></div>
-                        <div class="nights-item"><span class="nights-swatch pink" role="img" aria-label="Розовый"></span><span id="nights-pink">0</span></div>
+                        <div class="nights-item"><span class="nights-swatch blue" role="img" aria-label="Голубой"></span><span class="nights-value" id="nights-blue">0</span></div>
+                        <div class="nights-item"><span class="nights-swatch pink" role="img" aria-label="Розовый"></span><span class="nights-value" id="nights-pink">0</span></div>
                     </div>
                 </div>
                 <div class="status" id="status" role="status"></div>
