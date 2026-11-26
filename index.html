@@ -833,7 +833,6 @@
         }
         function changeMonth(index) {
             visibleMonth = Math.max(START, Math.min(END, index));
-            status.textContent = '';
             renderMonth();
         }
         function buildMonthMenu() {
@@ -950,7 +949,6 @@
             paintHalf(half);
             updateNights();
             saveMonth();
-            status.textContent = '';
         });
         document.getElementById('fill-free').addEventListener('click', () => {
             let count = 0;
@@ -963,14 +961,12 @@
             });
             updateNights();
             if (count) saveMonth();
-            status.textContent = count ? 'Заполнено половинок: ' + count + '.' : 'Свободных половинок нет.';
         });
         document.getElementById('reset-month').addEventListener('click', () => {
             monthData = {};
             calendar.querySelectorAll('.day-half').forEach(paintHalf);
             updateNights();
             saveMonth();
-            status.textContent = 'Открытый месяц очищен.';
         });
         window.addEventListener('storage', event => {
             if (event.key === null || event.key.startsWith(STORAGE_PREFIX)) {
