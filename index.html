@@ -5,564 +5,781 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Ноябрь 2026 - Интерактивный график</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            min-width: 320px;
+        :root {
+            --ink: #2e2842;
+            --muted: #625b73;
+            --accent: #514183;
+            --accent-strong: #413367;
+            --lavender: #e9e0fb;
+            --canvas: #f1edf7;
+            --paper: #fffdfd;
+            --panel: #f6f2fa;
+            --border: #e3ddec;
+            --day-border: #e6e0eb;
+            --weekend-ink: #8f3e61;
+            --weekend-surface: #fcf4f7;
+            --blue: #c8e0f7;
+            --blue-edge: #537ba4;
+            --pink: #f2cfe1;
+            --pink-edge: #a65f85;
+            --focus: #503b9a;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background-color: #f0f0f0;
-            padding: 2vw;
-            padding: max(2vw, env(safe-area-inset-top)) max(2vw, env(safe-area-inset-right)) max(2vw, env(safe-area-inset-bottom)) max(2vw, env(safe-area-inset-left));
+            margin: 0;
             min-height: 100vh;
             min-height: 100dvh;
+            padding: 44px 24px;
+            padding: max(44px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+                max(44px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+            background: var(--canvas);
+            color: var(--ink);
+            font: 400 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
         }
 
         .calendar-container {
-            background-color: white;
-            padding: 3vw;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: 2px solid #333;
-            width: 100%;
-            max-width: 700px;
+            box-sizing: border-box;
+            max-width: 1032px;
             margin: 0 auto;
+            padding: clamp(20px, 4vw, 38px);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            background: var(--paper);
+            box-shadow: 0 16px 42px rgb(57 36 90 / 9%), 0 2px 5px rgb(57 36 90 / 4%);
+        }
+
+        .calendar-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            justify-content: space-between;
+            gap: 18px 24px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .app-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 9px;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 650;
+        }
+
+        .calendar-icon {
+            width: 15px;
+            height: 13px;
+            box-sizing: border-box;
+            border: 1.5px solid currentColor;
+            border-radius: 4px;
+            background: linear-gradient(currentColor, currentColor) 0 3px / 100% 1px no-repeat;
         }
 
         h1 {
-            text-align: center;
-            font-size: clamp(20px, 7vw, 42px);
-            font-weight: bold;
-            margin-bottom: clamp(8px, 2vw, 15px);
-            letter-spacing: clamp(2px, 1vw, 8px);
+            margin: 0;
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 720;
+            letter-spacing: -.045em;
+            line-height: 1.08;
         }
 
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: clamp(6px, 2vw, 10px);
-            margin-bottom: clamp(8px, 2vw, 12px);
-            flex-wrap: wrap;
-            align-items: center;
+        button, select {
+            box-sizing: border-box;
+            min-height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--paper);
+            color: var(--ink);
+            font: inherit;
         }
 
-        .color-selector {
-            display: flex;
-            gap: clamp(4px, 1.5vw, 8px);
-            align-items: center;
+        button { cursor: pointer; touch-action: manipulation; }
+        button:disabled { cursor: default; }
+
+        button:focus, select:focus, a:focus { outline: 2px solid var(--focus); outline-offset: 2px; }
+        button:focus:not(:focus-visible), select:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
+
+        .month-navigation {
+            display: grid;
+            grid-template-columns: 44px minmax(0, 154px) 44px auto;
+            gap: 6px;
+            align-items: stretch;
         }
 
-        .color-selector span {
-            font-weight: bold;
-            font-size: clamp(12px, 3.5vw, 16px);
+        .month-navigation button:disabled { opacity: .42; }
+        .month-navigation select {
+            width: 100%;
+            min-width: 0;
+            padding-inline: 9px;
+            font-size: 16px;
         }
+
+        .arrow-btn { display: grid; place-items: center; }
+        .arrow-btn span {
+            width: 7px;
+            height: 7px;
+            border-top: 2px solid currentColor;
+            border-right: 2px solid currentColor;
+            transform: translateX(-1px) rotate(45deg);
+        }
+        #previous-month span { transform: translateX(1px) rotate(-135deg); }
+
+        #current-month {
+            padding-inline: 12px;
+            color: var(--accent);
+            background: var(--panel);
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .planner {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(210px, .39fr);
+            grid-template-areas: "board tools" "legend tools";
+            gap: 18px 24px;
+            margin-top: 20px;
+        }
+
+        .tools {
+            grid-area: tools;
+            align-self: start;
+            min-width: 0;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--panel);
+        }
+
+        .tool-title {
+            margin: 0 0 8px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .color-selector, .nights-counts {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .blue { --swatch: var(--blue); --swatch-edge: var(--blue-edge); }
+        .pink { --swatch: var(--pink); --swatch-edge: var(--pink-edge); }
 
         .color-btn {
-            width: clamp(32px, 10vw, 50px);
-            height: clamp(32px, 10vw, 50px);
-            border: 2px solid #333;
-            cursor: pointer;
-            transition: transform 0.2s;
-            flex-shrink: 0;
-        }
-
-        .color-btn:active {
-            transform: scale(1.1);
+            position: relative;
+            min-width: 44px;
+            background: var(--swatch);
+            border-color: var(--swatch-edge);
         }
 
         .color-btn.active {
-            border: 3px solid #000;
-            box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+            border-color: var(--accent);
+            box-shadow: inset 0 0 0 1px var(--accent);
         }
 
-        .color-btn.blue,
-        .day-half.blue,
-        .nights-swatch.blue {
-            background-color: #66ccff;
+        .color-btn.active::after {
+            content: "";
+            position: absolute;
+            inset: 50% auto auto 50%;
+            width: 11px;
+            height: 6px;
+            border: solid var(--ink);
+            border-width: 0 0 2px 2px;
+            transform: translate(-50%, -65%) rotate(-45deg);
         }
 
-        .color-btn.pink,
-        .day-half.pink,
-        .nights-swatch.pink {
-            background-color: #ff99cc;
+        .instruction {
+            margin: 8px 0 12px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .actions {
+            display: grid;
+            gap: 6px;
+        }
+
+        .fill-btn, .reset-btn {
+            padding: 6px 9px;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .fill-btn {
+            border-color: #d2c4ee;
+            background: var(--lavender);
+            color: var(--accent-strong);
         }
 
         .reset-btn {
-            padding: clamp(6px, 2vw, 10px) clamp(10px, 3vw, 16px);
-            font-size: clamp(12px, 3.5vw, 14px);
-            font-weight: bold;
-            background-color: #ff3366;
-            color: white;
-            border: none;
-            cursor: pointer;
-            white-space: nowrap;
-            border-radius: 4px;
+            border-color: transparent;
+            background: transparent;
+            color: var(--weekend-ink);
         }
 
-        .reset-btn:active {
-            background-color: #cc0033;
+        .status, .storage-note {
+            font-size: 12px;
+            color: var(--muted);
         }
+        .status:not(:empty) { margin-top: 7px; }
+        .storage-note { margin: 12px 0 0; }
+        .storage-note.warning { color: #8b3625; }
 
-        /* Счётчик ночей */
         .nights {
-            display: flex;
-            justify-content: center;
-            gap: clamp(10px, 4vw, 24px);
-            flex-wrap: wrap;
-            margin-bottom: clamp(8px, 2vw, 12px);
-            padding: clamp(6px, 1.5vw, 10px);
-            border: 2px solid #333;
-        }
-
-        .nights-title {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-            font-size: clamp(12px, 3.5vw, 16px);
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
         }
 
         .nights-item {
             display: flex;
             align-items: center;
-            gap: clamp(4px, 1.5vw, 8px);
-            font-size: clamp(14px, 4vw, 20px);
-            font-weight: bold;
+            justify-content: center;
+            gap: 8px;
+            padding: 5px 8px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--paper);
+            font-size: 18px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
         }
 
         .nights-swatch {
-            width: clamp(18px, 5vw, 26px);
-            height: clamp(18px, 5vw, 26px);
-            border: 2px solid #333;
-            flex-shrink: 0;
+            flex: none;
+            width: 10px;
+            height: 10px;
+            border: 1px solid var(--swatch-edge);
+            border-radius: 50%;
+            background: var(--swatch);
         }
 
-        .weekdays {
+        .board { grid-area: board; min-width: 0; }
+        .weekdays, .calendar {
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
-            background-color: black;
-            color: white;
-            font-weight: bold;
-            font-size: clamp(7px, 2.2vw, 11px);
-            text-transform: uppercase;
+            gap: 5px;
         }
 
         .weekday {
-            padding: clamp(4px, 1.2vw, 8px) 1px;
+            padding: 0 0 7px;
+            color: var(--muted);
             text-align: center;
-            border-right: 1px solid white;
+            font-size: 13px;
+            font-weight: 650;
         }
-
-        .weekday:last-child {
-            border-right: none;
-        }
-
-        .weekday.saturday,
-        .weekday.sunday {
-            background-color: #ff3366;
-        }
-
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(0, 1fr));
-            border: 2px solid #333;
-            border-top: none;
-        }
+        .weekday.weekend { color: var(--weekend-ink); }
 
         .day {
-            aspect-ratio: 1 / 1;
-            border: 1px solid #999;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: white;
-        }
-
-        .day-number {
-            font-size: clamp(16px, 5.5vw, 36px);
-            font-weight: bold;
-            position: relative;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        /* Выходные и праздники - красный цвет */
-        .day.saturday .day-number,
-        .day.sunday .day-number,
-        .day.holiday .day-number {
-            color: #ff3366;
+            display: grid;
+            place-items: center;
+            box-sizing: border-box;
+            width: 100%;
+            min-height: 48px;
+            aspect-ratio: 6 / 5;
+            overflow: hidden;
+            isolation: isolate;
+            border: 1px solid var(--day-border);
+            border-radius: 11px;
+            background: var(--paper);
         }
 
         .day.empty {
-            background-color: white;
+            border-color: transparent;
+            background: var(--panel);
         }
+
+        .day.holiday {
+            background: var(--weekend-surface);
+            color: var(--weekend-ink);
+        }
+
+        .day-number {
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+            font-size: clamp(17px, 2.65vw, 25px);
+            font-weight: 660;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .day-number sup {
+            position: absolute;
+            top: 0;
+            inset-inline-start: calc(100% + 1px);
+            font-size: .58em;
+        }
+
+        .day.today { border-color: var(--accent); }
+        .day.today::after {
+            content: "";
+            position: absolute;
+            z-index: 2;
+            inset: 0;
+            border: 1px solid var(--accent);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .day.today .day-number {
+            padding: 3px 5px;
+            border-radius: 6px;
+            background: var(--accent);
+            color: white;
+        }
+        .day.today .day-number sup { color: var(--accent-strong); }
 
         .day-half {
             position: absolute;
-            top: 0;
-            bottom: 0;
+            inset-block: 0;
             width: 50%;
-            cursor: pointer;
-            z-index: 5;
+            min-height: 0;
             padding: 0;
             border: 0;
             border-radius: 0;
             background: transparent;
-            appearance: none;
+            color: inherit;
             -webkit-appearance: none;
-            touch-action: manipulation;
+            appearance: none;
         }
+        .day-half.left { left: 0; border-right: 1px solid rgb(46 40 66 / 11%); }
+        .day-half.right { right: 0; }
+        .day-half[aria-pressed="true"] { background: var(--swatch); }
+        .day-half:focus { outline-offset: -3px; }
+        .day-half:active { box-shadow: inset 0 0 0 2px var(--accent); }
 
-        .day-half:active {
-            opacity: 0.7;
-        }
-
-        .day-half.left {
-            left: 0;
-        }
-
-        .day-half.right {
-            right: 0;
-        }
-
-        .instruction {
-            text-align: center;
-            margin-bottom: clamp(6px, 2vw, 10px);
-            font-size: clamp(10px, 3vw, 14px);
-            color: #666;
-            line-height: 1.3;
+        @media (hover: hover) {
+            .arrow-btn:enabled:hover, #current-month:hover, .reset-btn:hover { background: var(--panel); }
+            #current-month:hover, .reset-btn:hover { border-color: #cbbce5; }
+            .fill-btn:hover { background: #ded2f6; }
+            .day-half:hover { box-shadow: inset 0 0 0 1px var(--accent); }
         }
 
         .legend {
-            margin-top: clamp(8px, 2vw, 15px);
+            grid-area: legend;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .legend-key {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px 14px;
+            margin: 0;
+        }
+
+        .legend-key span { display: inline-flex; align-items: center; gap: 6px; }
+        .legend-key i {
+            box-sizing: border-box;
+            width: 11px;
+            height: 11px;
+            border: 1px solid var(--accent);
+            border-radius: 3px;
+        }
+        .legend-key .off-key { background: var(--weekend-surface); border-color: var(--weekend-ink); }
+        .legend-key b { color: var(--accent); font-size: 16px; line-height: .8; }
+
+        #month-notes:not(:empty) {
+            display: grid;
+            gap: 5px;
+            margin: 13px 0 0;
+            padding: 10px 0 0;
+            border-top: 1px solid var(--border);
+            list-style: none;
+        }
+        #month-notes li { display: flex; align-items: baseline; gap: 8px; }
+        .note-date {
+            flex: none;
+            min-width: 2ch;
+            padding: 1px 5px;
+            border-radius: 5px;
+            background: var(--panel);
+            color: var(--accent);
+            font-size: 12px;
+            font-variant-numeric: tabular-nums;
             text-align: center;
-            font-size: clamp(9px, 2.5vw, 12px);
-            color: #666;
+        }
+        #calendar-source {
+            display: inline-block;
+            margin-top: 12px;
+            color: var(--accent);
+            text-underline-offset: 3px;
         }
 
-        button { font-family: inherit; touch-action: manipulation; }
-        button:focus-visible { outline: 3px solid #2455aa; outline-offset: -3px; }
-        .day-number sup { font-size: 0.45em; vertical-align: super; }
-        .fill-btn {
-            padding: 10px 14px;
-            min-height: 44px;
-            font-size: clamp(12px, 3.5vw, 14px);
-            font-weight: bold;
-            background: #222;
-            color: white;
-            border: 0;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .fill-btn:active { background: #444; }
-        .color-btn { min-width: 44px; min-height: 44px; border-radius: 0; }
-        .reset-btn { min-height: 44px; }
-        .status { text-align: center; font-size: 12px; color: #555; min-height: 1.4em; margin-bottom: 8px; }
-        @media (max-width: 420px) {
-            .fill-btn { flex-basis: 100%; order: 3; }
-        }
-        @media (min-width: 600px) {
+        @media (max-width: 760px) {
+            body { padding: 18px 12px; }
             body {
-                padding: 20px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                padding: max(18px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+                    max(18px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
             }
+            .calendar-container { padding: clamp(12px, 3.5vw, 24px); border-radius: 22px; }
+            .calendar-header {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 13px;
+                padding-bottom: 14px;
+            }
+            .month-navigation { grid-template-columns: 44px minmax(0, 1fr) 44px auto; }
+            .planner { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tools" "board" "legend"; gap: 14px; margin-top: 14px; }
+            .tools {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 10px 12px;
+                padding: 12px;
+            }
+            .actions { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) auto; }
+            .nights {
+                grid-column: 2;
+                grid-row: 1;
+                margin: 0;
+                padding: 0;
+                border: 0;
+            }
+            .nights-item { min-width: 0; padding-block: 8px; }
+            .instruction { margin: 6px 0 0; }
+            .storage-note, .status { grid-column: 1 / -1; margin: 0; }
+            .status:not(:empty) { margin-top: 0; }
+            .status:empty { display: none; }
+        }
 
-            .calendar-container {
-                padding: 20px;
-            }
+        @media (max-width: 420px) {
+            .month-navigation { grid-template-columns: 44px minmax(0, 1fr) 44px; }
+            #current-month { grid-column: 1 / -1; }
+            .actions { grid-template-columns: minmax(0, 1fr) minmax(0, .58fr); }
+            .calendar, .weekdays { gap: 3px; }
+            .day { border-radius: 8px; }
         }
 
         @media print {
-            .controls,
-            .instruction,
-            .status {
-                display: none;
-            }
+            body { padding: 0; background: white; }
+            .calendar-container { padding: 0; border: 0; box-shadow: none; }
+            .calendar-header { padding-bottom: 12px; }
+            .planner { display: block; }
+            .tools { margin-top: 10px; padding: 0; border: 0; background: none; }
+            .nights { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 0; border: 0; }
+            .nights .tool-title { margin: 0; }
+            .month-navigation, .color-tools, .actions, .storage-note, .status { display: none; }
+            .day { min-height: 32px; height: 52px; aspect-ratio: auto; }
+            .legend { margin-top: 10px; }
+            .day, .nights-swatch { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
-    <div class="calendar-container">
-        <h1>НОЯБРЬ 2026</h1>
+    <main class="calendar-container">
+        <header class="calendar-header">
+            <div>
+                <p class="app-label"><span class="calendar-icon" aria-hidden="true"></span>Календарь</p>
+                <h1 id="month-heading" aria-live="polite">График</h1>
+            </div>
+            <nav class="month-navigation" aria-label="Переключение месяца">
+                <button type="button" class="arrow-btn" id="previous-month" aria-label="Предыдущий месяц" title="Предыдущий месяц"><span aria-hidden="true"></span></button>
+                <select id="month-select" aria-label="Месяц и год"></select>
+                <button type="button" class="arrow-btn" id="next-month" aria-label="Следующий месяц" title="Следующий месяц"><span aria-hidden="true"></span></button>
+                <button type="button" id="current-month">Текущий месяц</button>
+            </nav>
+        </header>
 
-        <div class="instruction">
-            Выберите цвет и кликайте по половинкам дней.<br>
-            Левая = утро, правая = вечер.<br>
-            «Заполнить свободные дни» закрасит только пустые половинки.
+        <div class="planner">
+            <div class="tools">
+                <div class="color-tools">
+                    <h2 class="tool-title" id="palette-heading">Цвет отметки</h2>
+                    <div class="color-selector" role="group" aria-labelledby="palette-heading">
+                        <button type="button" class="color-btn blue active" data-color="blue" aria-label="Голубой" title="Голубой" aria-pressed="true"></button>
+                        <button type="button" class="color-btn pink" data-color="pink" aria-label="Розовый" title="Розовый" aria-pressed="false"></button>
+                    </div>
+                    <p class="instruction">Утро слева, вечер справа.</p>
+                </div>
+                <div class="actions">
+                    <button type="button" class="fill-btn" id="fill-free">Заполнить свободные дни</button>
+                    <button type="button" class="reset-btn" id="reset-month">Очистить месяц</button>
+                </div>
+                <div class="nights" role="group" aria-labelledby="nights-heading">
+                    <h2 class="tool-title" id="nights-heading" title="По закрашенным вечерним половинкам">Ночей за месяц</h2>
+                    <div class="nights-counts">
+                        <div class="nights-item"><span class="nights-swatch blue" role="img" aria-label="Голубой"></span><span id="nights-blue">0</span></div>
+                        <div class="nights-item"><span class="nights-swatch pink" role="img" aria-label="Розовый"></span><span id="nights-pink">0</span></div>
+                    </div>
+                </div>
+                <div class="status" id="status" role="status"></div>
+                <p class="storage-note" id="storage-note" role="status">Раскраска сохраняется в этом браузере.</p>
+            </div>
+
+            <div class="board">
+                <div class="weekdays" aria-hidden="true">
+                    <div class="weekday">Пн</div>
+                    <div class="weekday">Вт</div>
+                    <div class="weekday">Ср</div>
+                    <div class="weekday">Чт</div>
+                    <div class="weekday">Пт</div>
+                    <div class="weekday weekend">Сб</div>
+                    <div class="weekday weekend">Вс</div>
+                </div>
+                <div class="calendar" id="calendar" role="group" aria-labelledby="month-heading"></div>
+                <noscript>Для работы календаря включите JavaScript в браузере.</noscript>
+            </div>
+
+            <footer class="legend">
+                <p class="legend-key">
+                    <span><i class="off-key" aria-hidden="true"></i>Выходной</span>
+                    <span><b aria-hidden="true">*</b>Сокращённый день</span>
+                    <span><i aria-hidden="true"></i>Сегодня</span>
+                </p>
+                <ul id="month-notes" aria-label="Праздники, переносы и сокращённые дни"></ul>
+                <a id="calendar-source" href="https://www.consultant.ru/law/ref/calendar/proizvodstvennye/2026/" target="_blank" rel="noopener noreferrer">Производственный календарь РФ</a>
+            </footer>
         </div>
-
-        <div class="controls">
-            <div class="color-selector">
-                <span>Цвет:</span>
-                <button type="button" class="color-btn blue active" data-color="blue" aria-label="Голубой" aria-pressed="true"></button>
-                <button type="button" class="color-btn pink" data-color="pink" aria-label="Розовый" aria-pressed="false"></button>
-            </div>
-            <button type="button" class="fill-btn" id="fill-free">Заполнить свободные дни</button>
-            <button type="button" class="reset-btn" onclick="resetCalendar()">Очистить</button>
-        </div>
-
-        <div class="status" id="status" role="status" aria-live="polite"></div>
-
-        <div class="nights">
-            <div class="nights-title">Ночей за месяц</div>
-            <div class="nights-item">
-                <div class="nights-swatch blue"></div>
-                <span id="nights-blue">0</span>
-            </div>
-            <div class="nights-item">
-                <div class="nights-swatch pink"></div>
-                <span id="nights-pink">0</span>
-            </div>
-        </div>
-
-        <div class="weekdays">
-            <div class="weekday">ПН</div>
-            <div class="weekday">ВТ</div>
-            <div class="weekday">СР</div>
-            <div class="weekday">ЧТ</div>
-            <div class="weekday">ПТ</div>
-            <div class="weekday saturday">СБ</div>
-            <div class="weekday sunday">ВС</div>
-        </div>
-
-        <div class="calendar" id="calendar">
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day sunday" data-day="1" title="1 ноября">
-                <button type="button" class="day-half left" aria-label="1 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="1 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">1</span>
-            </div>
-            <div class="day" data-day="2" title="2 ноября">
-                <button type="button" class="day-half left" aria-label="2 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="2 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">2</span>
-            </div>
-            <div class="day" data-day="3" title="3 ноября - сокращённый рабочий день">
-                <button type="button" class="day-half left" aria-label="3 ноября - сокращённый рабочий день, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="3 ноября - сокращённый рабочий день, вечер" aria-pressed="false"></button>
-                <span class="day-number">3<sup>*</sup></span>
-            </div>
-            <div class="day holiday" data-day="4" title="4 ноября - День народного единства">
-                <button type="button" class="day-half left" aria-label="4 ноября - День народного единства, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="4 ноября - День народного единства, вечер" aria-pressed="false"></button>
-                <span class="day-number">4</span>
-            </div>
-            <div class="day" data-day="5" title="5 ноября">
-                <button type="button" class="day-half left" aria-label="5 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="5 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">5</span>
-            </div>
-            <div class="day" data-day="6" title="6 ноября">
-                <button type="button" class="day-half left" aria-label="6 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="6 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">6</span>
-            </div>
-            <div class="day saturday" data-day="7" title="7 ноября">
-                <button type="button" class="day-half left" aria-label="7 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="7 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">7</span>
-            </div>
-            <div class="day sunday" data-day="8" title="8 ноября">
-                <button type="button" class="day-half left" aria-label="8 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="8 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">8</span>
-            </div>
-            <div class="day" data-day="9" title="9 ноября">
-                <button type="button" class="day-half left" aria-label="9 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="9 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">9</span>
-            </div>
-            <div class="day" data-day="10" title="10 ноября">
-                <button type="button" class="day-half left" aria-label="10 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="10 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">10</span>
-            </div>
-            <div class="day" data-day="11" title="11 ноября">
-                <button type="button" class="day-half left" aria-label="11 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="11 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">11</span>
-            </div>
-            <div class="day" data-day="12" title="12 ноября">
-                <button type="button" class="day-half left" aria-label="12 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="12 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">12</span>
-            </div>
-            <div class="day" data-day="13" title="13 ноября">
-                <button type="button" class="day-half left" aria-label="13 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="13 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">13</span>
-            </div>
-            <div class="day saturday" data-day="14" title="14 ноября">
-                <button type="button" class="day-half left" aria-label="14 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="14 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">14</span>
-            </div>
-            <div class="day sunday" data-day="15" title="15 ноября">
-                <button type="button" class="day-half left" aria-label="15 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="15 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">15</span>
-            </div>
-            <div class="day" data-day="16" title="16 ноября">
-                <button type="button" class="day-half left" aria-label="16 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="16 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">16</span>
-            </div>
-            <div class="day" data-day="17" title="17 ноября">
-                <button type="button" class="day-half left" aria-label="17 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="17 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">17</span>
-            </div>
-            <div class="day" data-day="18" title="18 ноября">
-                <button type="button" class="day-half left" aria-label="18 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="18 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">18</span>
-            </div>
-            <div class="day" data-day="19" title="19 ноября">
-                <button type="button" class="day-half left" aria-label="19 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="19 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">19</span>
-            </div>
-            <div class="day" data-day="20" title="20 ноября">
-                <button type="button" class="day-half left" aria-label="20 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="20 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">20</span>
-            </div>
-            <div class="day saturday" data-day="21" title="21 ноября">
-                <button type="button" class="day-half left" aria-label="21 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="21 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">21</span>
-            </div>
-            <div class="day sunday" data-day="22" title="22 ноября">
-                <button type="button" class="day-half left" aria-label="22 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="22 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">22</span>
-            </div>
-            <div class="day" data-day="23" title="23 ноября">
-                <button type="button" class="day-half left" aria-label="23 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="23 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">23</span>
-            </div>
-            <div class="day" data-day="24" title="24 ноября">
-                <button type="button" class="day-half left" aria-label="24 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="24 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">24</span>
-            </div>
-            <div class="day" data-day="25" title="25 ноября">
-                <button type="button" class="day-half left" aria-label="25 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="25 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">25</span>
-            </div>
-            <div class="day" data-day="26" title="26 ноября">
-                <button type="button" class="day-half left" aria-label="26 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="26 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">26</span>
-            </div>
-            <div class="day" data-day="27" title="27 ноября">
-                <button type="button" class="day-half left" aria-label="27 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="27 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">27</span>
-            </div>
-            <div class="day saturday" data-day="28" title="28 ноября">
-                <button type="button" class="day-half left" aria-label="28 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="28 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">28</span>
-            </div>
-            <div class="day sunday" data-day="29" title="29 ноября">
-                <button type="button" class="day-half left" aria-label="29 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="29 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">29</span>
-            </div>
-            <div class="day" data-day="30" title="30 ноября">
-                <button type="button" class="day-half left" aria-label="30 ноября, утро" aria-pressed="false"></button>
-                <button type="button" class="day-half right" aria-label="30 ноября, вечер" aria-pressed="false"></button>
-                <span class="day-number">30</span>
-            </div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-            <div class="day empty" aria-hidden="true"></div>
-        </div>
-
-        <div class="legend">
-            Красным отмечены субботы, воскресенья и 4 ноября - День народного единства.<br>
-            * 3 ноября - рабочий день, сокращённый на один час.<br>
-            Ночи считаются по закрашенным правым половинкам.
-        </div>
-    </div>
+    </main>
 
     <script>
+        'use strict';
+        const START = 2026 * 12 + 10; // Ноябрь 2026, месяцы от нуля.
+        const END = 2027 * 12 + 11;
+        const STORAGE_PREFIX = 'family-calendar:v1:';
+        const COLORS = ['blue', 'pink'];
+        const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        const holidays = {
+            '01-01': 'Новогодние каникулы', '01-02': 'Новогодние каникулы',
+            '01-03': 'Новогодние каникулы', '01-04': 'Новогодние каникулы',
+            '01-05': 'Новогодние каникулы', '01-06': 'Новогодние каникулы',
+            '01-07': 'Рождество Христово', '01-08': 'Новогодние каникулы',
+            '02-23': 'День защитника Отечества', '03-08': 'Международный женский день',
+            '05-01': 'Праздник Весны и Труда', '05-09': 'День Победы',
+            '06-12': 'День России', '11-04': 'День народного единства'
+        };
+        // Постановления Правительства РФ от 24.09.2025 № 1466 и от 17.09.2026 № 1187.
+        const transferredDaysOff = {
+            '2026-12-31': 'Выходной: перенос с 4 января',
+            '2027-02-22': 'Выходной: перенос с 20 февраля',
+            '2027-05-03': 'Выходной: перенос с 1 мая',
+            '2027-05-10': 'Выходной: перенос с 9 мая',
+            '2027-06-14': 'Выходной: перенос с 12 июня',
+            '2027-11-05': 'Выходной: перенос с 2 января',
+            '2027-12-31': 'Выходной: перенос с 3 января'
+        };
+        const workingWeekends = new Set(['2027-02-20']);
+        const shortDays = new Set(['2026-11-03', '2027-02-20', '2027-04-30', '2027-06-11', '2027-11-03']);
+        const calendar = document.getElementById('calendar');
+        const select = document.getElementById('month-select');
+        const status = document.getElementById('status');
+        const storageNote = document.getElementById('storage-note');
+        const memory = new Map();
         let selectedColor = 'blue';
+        let visibleMonth = currentMonth();
+        let monthData = {};
+        let storageIssue = false;
 
-        // Считаем ночи - закрашенные правые половинки
-        function updateNights() {
-            document.getElementById('nights-blue').textContent =
-                document.querySelectorAll('.day-half.right.blue').length;
-            document.getElementById('nights-pink').textContent =
-                document.querySelectorAll('.day-half.right.pink').length;
+        function currentMonth() {
+            const today = new Date();
+            return Math.max(START, Math.min(END, today.getFullYear() * 12 + today.getMonth()));
         }
-
-        document.querySelectorAll('.color-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.color-btn').forEach(b => {
-                    b.classList.remove('active');
-                    b.setAttribute('aria-pressed', 'false');
-                });
-                this.classList.add('active');
-                this.setAttribute('aria-pressed', 'true');
-                selectedColor = this.dataset.color;
-            });
-        });
-
-        document.querySelectorAll('.day-half').forEach(half => {
-            half.addEventListener('click', function() {
-                // Повторный клик тем же цветом - стирает
-                if (this.classList.contains(selectedColor)) {
-                    this.classList.remove(selectedColor);
-                } else {
-                    this.classList.remove('blue', 'pink');
-                    this.classList.add(selectedColor);
+        function monthKey(index) {
+            return Math.floor(index / 12) + '-' + String(index % 12 + 1).padStart(2, '0');
+        }
+        function storageWarning() {
+            storageIssue = true;
+            storageNote.textContent = 'Не удалось прочитать или сохранить данные. Изменения доступны в этой вкладке, но могут не сохраниться после закрытия. Проверьте доступ браузера к хранилищу.';
+            storageNote.classList.add('warning');
+        }
+        function readMonth() {
+            const key = monthKey(visibleMonth);
+            if (memory.has(key)) return memory.get(key);
+            let data = {};
+            try {
+                const raw = localStorage.getItem(STORAGE_PREFIX + key);
+                if (raw !== null) {
+                    const parsed = JSON.parse(raw);
+                    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Invalid data');
+                    const days = new Date(Math.floor(visibleMonth / 12), visibleMonth % 12 + 1, 0).getDate();
+                    // Читаем только известные даты, половинки и цвета.
+                    for (let day = 1; day <= days; day++) {
+                        for (const side of ['left', 'right']) {
+                            const slot = day + '-' + side;
+                            if (COLORS.includes(parsed[slot])) data[slot] = parsed[slot];
+                        }
+                    }
                 }
-                this.setAttribute('aria-pressed', String(this.classList.contains('blue') || this.classList.contains('pink')));
-                document.getElementById('status').textContent = '';
-                updateNights();
-            });
-        });
-
-        document.getElementById('fill-free').addEventListener('click', function() {
-            const emptyHalves = document.querySelectorAll('.day-half:not(.blue):not(.pink)');
-            emptyHalves.forEach(half => {
-                half.classList.add(selectedColor);
-                half.setAttribute('aria-pressed', 'true');
-            });
-            updateNights();
-            document.getElementById('status').textContent = emptyHalves.length
-                ? 'Заполнено половинок: ' + emptyHalves.length + '.'
-                : 'Свободных половинок нет.';
-        });
-
-        function resetCalendar() {
-            document.querySelectorAll('.day-half').forEach(half => {
-                half.classList.remove('blue', 'pink');
-                half.setAttribute('aria-pressed', 'false');
-            });
-            document.getElementById('status').textContent = 'Календарь очищен.';
+            } catch (error) { storageWarning(); }
+            memory.set(key, data);
+            return data;
+        }
+        function saveMonth() {
+            memory.set(monthKey(visibleMonth), monthData);
+            try {
+                localStorage.setItem(STORAGE_PREFIX + monthKey(visibleMonth), JSON.stringify(monthData));
+                storageIssue = false;
+                storageNote.textContent = 'Раскраска сохранена в этом браузере.';
+                storageNote.classList.remove('warning');
+            } catch (error) { storageWarning(); }
+        }
+        function dayInfo(year, month, day) {
+            const date = new Date(year, month, day);
+            const key = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+            const holiday = holidays[key.slice(5)];
+            const transferred = transferredDaysOff[key];
+            const working = workingWeekends.has(key);
+            const weekend = date.getDay() === 0 || date.getDay() === 6;
+            return { key, off: !working && Boolean(weekend || holiday || transferred),
+                short: shortDays.has(key),
+                note: holiday || transferred || (working ? 'Рабочая суббота: перенос выходного на 22 февраля' : '') };
+        }
+        function updateNights() {
+            for (const color of COLORS) {
+                document.getElementById('nights-' + color).textContent =
+                    Object.entries(monthData).filter(([slot, value]) => slot.endsWith('-right') && value === color).length;
+            }
+        }
+        function paintHalf(half) {
+            const color = monthData[half.dataset.slot];
+            half.classList.remove(...COLORS);
+            if (color) half.classList.add(color);
+            half.setAttribute('aria-pressed', String(Boolean(color)));
+            half.setAttribute('aria-label', half.dataset.label + ', ' +
+                (color === 'blue' ? 'голубой' : color === 'pink' ? 'розовый' : 'не закрашено'));
+        }
+        function renderMonth() {
+            monthData = readMonth();
+            const year = Math.floor(visibleMonth / 12);
+            const month = visibleMonth % 12;
+            const title = monthNames[month] + ' ' + year;
+            document.getElementById('month-heading').textContent = title;
+            document.title = title + ' - Интерактивный график';
+            select.value = String(visibleMonth);
+            document.getElementById('previous-month').disabled = visibleMonth === START;
+            document.getElementById('next-month').disabled = visibleMonth === END;
+            calendar.replaceChildren();
+            const notes = document.getElementById('month-notes');
+            notes.replaceChildren();
+            const days = new Date(year, month + 1, 0).getDate();
+            const offset = (new Date(year, month, 1).getDay() + 6) % 7;
+            const cells = Math.ceil((offset + days) / 7) * 7;
+            const today = new Date();
+            for (let cell = 0; cell < cells; cell++) {
+                const day = cell - offset + 1;
+                const box = document.createElement('div');
+                box.className = 'day';
+                if (day < 1 || day > days) {
+                    box.classList.add('empty');
+                    box.setAttribute('aria-hidden', 'true');
+                } else {
+                    const info = dayInfo(year, month, day);
+                    box.dataset.day = day;
+                    if (info.off) box.classList.add('holiday');
+                    const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+                    if (isToday) { box.classList.add('today'); box.setAttribute('aria-current', 'date'); }
+                    const dateLabel = new Date(year, month, day).toLocaleDateString('ru-RU', {day: 'numeric', month: 'long', year: 'numeric'});
+                    const label = dateLabel + (info.note ? ', ' + info.note : '') +
+                        (info.short ? ', сокращённый рабочий день' : '') + (isToday ? ', сегодня' : '');
+                    box.title = label;
+                    for (const side of ['left', 'right']) {
+                        const half = document.createElement('button');
+                        half.type = 'button';
+                        half.className = 'day-half ' + side;
+                        half.dataset.slot = day + '-' + side;
+                        half.dataset.label = label + ', ' + (side === 'left' ? 'утро' : 'вечер');
+                        paintHalf(half);
+                        box.append(half);
+                    }
+                    const number = document.createElement('span');
+                    number.className = 'day-number';
+                    number.textContent = day;
+                    if (info.short) {
+                        const star = document.createElement('sup');
+                        star.textContent = '*';
+                        number.append(star);
+                    }
+                    box.append(number);
+                    if (info.note || info.short) {
+                        const line = document.createElement('li');
+                        const noteDate = document.createElement('span');
+                        noteDate.className = 'note-date';
+                        noteDate.textContent = day;
+                        const noteText = (info.note || 'Сокращённый рабочий день') +
+                            (info.note && info.short ? ' (на час короче)' : '');
+                        line.append(noteDate, noteText);
+                        notes.append(line);
+                    }
+                }
+                calendar.append(box);
+            }
+            document.getElementById('calendar-source').href = 'https://www.consultant.ru/law/ref/calendar/proizvodstvennye/' + year + '/';
             updateNights();
         }
+        function changeMonth(index) {
+            visibleMonth = Math.max(START, Math.min(END, index));
+            status.textContent = '';
+            renderMonth();
+        }
+        for (let index = START; index <= END; index++) {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = monthNames[index % 12] + ' ' + Math.floor(index / 12);
+            select.append(option);
+        }
+        document.getElementById('previous-month').addEventListener('click', () => changeMonth(visibleMonth - 1));
+        document.getElementById('next-month').addEventListener('click', () => changeMonth(visibleMonth + 1));
+        document.getElementById('current-month').addEventListener('click', () => changeMonth(currentMonth()));
+        select.addEventListener('change', () => changeMonth(Number(select.value)));
+        document.querySelectorAll('.color-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                selectedColor = button.dataset.color;
+                document.querySelectorAll('.color-btn').forEach(other => {
+                    const active = other === button;
+                    other.classList.toggle('active', active);
+                    other.setAttribute('aria-pressed', String(active));
+                });
+            });
+        });
+        calendar.addEventListener('click', event => {
+            const half = event.target.closest('.day-half');
+            if (!half) return;
+            const slot = half.dataset.slot;
+            if (monthData[slot] === selectedColor) delete monthData[slot];
+            else monthData[slot] = selectedColor;
+            paintHalf(half);
+            updateNights();
+            saveMonth();
+            status.textContent = '';
+        });
+        document.getElementById('fill-free').addEventListener('click', () => {
+            let count = 0;
+            calendar.querySelectorAll('.day-half').forEach(half => {
+                if (!monthData[half.dataset.slot]) {
+                    monthData[half.dataset.slot] = selectedColor;
+                    paintHalf(half);
+                    count++;
+                }
+            });
+            updateNights();
+            if (count) saveMonth();
+            status.textContent = count ? 'Заполнено половинок: ' + count + '.' : 'Свободных половинок нет.';
+        });
+        document.getElementById('reset-month').addEventListener('click', () => {
+            monthData = {};
+            calendar.querySelectorAll('.day-half').forEach(paintHalf);
+            updateNights();
+            saveMonth();
+            status.textContent = 'Открытый месяц очищен.';
+        });
+        window.addEventListener('storage', event => {
+            if (event.key === null || event.key.startsWith(STORAGE_PREFIX)) {
+                if (event.key === null) memory.clear();
+                else memory.delete(event.key.slice(STORAGE_PREFIX.length));
+                renderMonth();
+            }
+        });
+        window.addEventListener('pageshow', event => {
+            if (event.persisted) {
+                if (!storageIssue) memory.clear();
+                changeMonth(currentMonth());
+            }
+        });
+        renderMonth();
     </script>
 </body>
 </html>
